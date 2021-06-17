@@ -1,0 +1,163 @@
+---
+title: "Analise Exploratória Diamonds"
+author: 'Guilherme Santana Santos, Matricula : 92068901'
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r echo = FALSE, results = 'hide', message = FALSE}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(ggpubr)
+```
+
+  Este documento tem como objetivo realizar a analise exploratória da base de dados Diamonds.
+
+**Conhecendo a base de dados e fazendo analise exploratoria:**
+
+##### Colunas e tipos:
+```{r}
+diamantes <- diamonds
+str(diamantes)
+```
+##### Cabeçalho da base:
+
+```{r}
+kable(head(diamantes))
+```
+
+##### Ultimas linhas da base:
+
+```{r}
+kable(tail(diamantes))
+```
+
+##### Sumário:
+
+```{r}
+
+summary(diamantes)
+```
+
+
+##### Abaixo podemos observar que o preço dos diamantes não possuem outliers e a moioria custa menos que 5000.
+
+
+
+```{r}
+media_price = mean(diamantes$price)
+media_price 
+ggplot(diamantes) + geom_boxplot(aes(x ="Preço", y = price), width = 0.3, varwidth = F) + labs(y = "Preço dos diamantes", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+
+##### Com o histograma abaixo podemos concluir que a maioria dos diamantes possuem preços abaixo da média.
+
+
+
+```{r}
+ggplot(diamantes) + geom_histogram(aes(price), bins = 25, fill = "green", color = "black") + geom_vline(xintercept = mean(diamantes$price), color = "red", lwd = 2) +
+ labs(title = "Vermelho: média.")
+```
+
+
+##### Abaixo podemos observar que os dados sobre kilate dos diamantes talvez possuam outliers e sua grande maioria pesa menos que um kilate. 
+
+
+```{r}
+ggplot(diamantes) + geom_boxplot(aes(x ="Peso", y = carat), width = 0.3, varwidth = F) + labs(y = "Peso dos diamantes", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+
+
+##### Abaixo podemos observar a distribuição do comprimento dos diamantes em mm, os dados aparentam possuir outliers.
+
+
+
+```{r}
+ggplot(diamantes) + geom_boxplot(aes(x ="", y = x), width = 0.3, varwidth = F) + labs(y = "Comprimento em mm", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+
+
+
+##### O boxplot abaixo mostra a distibuição da largura em mm dos diamantes, há larguras que estão totalmente isoladas na distribuição o que aparenta ser um outlier. 
+
+
+
+
+```{r}
+ggplot(diamantes) + geom_boxplot(aes(x ="", y = y), width = 0.3, varwidth = F) + labs(y = "Largura em mm", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+
+
+##### O boxplot abaixo mostra a distibuição da profundidade em mm dos diamantes, há profundidades que estão totalmente isoladas na distribuição o que aparenta ser um outlier. 
+
+
+
+```{r}
+ggplot(diamantes) + geom_boxplot(aes(x ="", y = z), width = 0.3, varwidth = F) + labs(y = "Profundidade em mm", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+
+
+##### O boxplot abaixo mostra a distibuição do percentual de profundidade dos diamantes, há dados que estão totalmente isoladas na distribuição o que aparenta serem  outliers. 
+
+
+
+```{r}
+ggplot(diamantes) + geom_boxplot(aes(x ="", y = depth), width = 0.3, varwidth = F) + labs(y = "Percentual de profundidade", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+
+##### O boxplot abaixo mostra a largura do topo do diamante relativo ao ponto mais largo dos diamantes, há dados que estão totalmente isoladas na distribuição o que aparenta serem  outliers.
+
+
+
+
+```{r}
+ggplot(diamantes) + geom_boxplot(aes(x ="", y = table), width = 0.3, varwidth = F) + labs(y = "Largura do topo do diamante relativo ao ponto mais largo", x = "", caption = "Fonte: R GGPLOT") + scale_x_discrete(labels = NULL, breaks = NULL) + labs_pubr() + theme_pubr() +
+  theme(plot.caption = element_text(hjust = 0))
+```
+
+## **Gráficos exploratórios:**
+
+#### Qual a diferença entre os preços da melhor e pior cor de diamante em relação ao seu peso?
+
+```{r}
+diamantesMelhorPiorCor <- diamantes %>% filter(!color %in% c("E", "F", "G", "H", "I"))
+
+ggplot(diamantesMelhorPiorCor) + geom_point(aes(x = carat , y = price, color = color))
+```
+
+#### Quantos diamantes são maiores e menores que 1 kilate?
+
+```{r}
+diamantes$one_carat_or_more = ifelse(diamantes$carat >= 1, "Sim", "Não")
+
+barplot(table(diamantes$one_carat_or_more), col = "light blue" , ylab = "Total de Diamantes", xlab = "Maior que 1 quilate?", ylim=c(0,40000))
+```
+
+#### Qual o preço dos diamantes maiores e menores que 1 kilate de acordo com a qualidade de corte?
+
+```{r}
+ggplot(diamantes, aes(x = carat, y=price, color = one_carat_or_more)) + geom_point(alpha=2) + labs(title = "Preço dos diamantes menores e maiores que um Kilate divido por qualidade de corte", x = "Kilates", y= "Preço", color = "1 kilate ou mais? ") + facet_grid(. ~ cut)
+```
+
+
+#### Quais são os diamantes que possuem menor e maior preço de acordo com a qualidade de corte?
+
+
+```{r}
+ggplot(diamantes, aes(x=price)) + geom_density(aes(fill=cut),alpha=0.7) 
+``` 
+
